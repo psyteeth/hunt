@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Охота на психолога-добычу</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Manrope:wght@400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F5F4F0;
+  --white: #ffffff;
+  --text: #1A1A18;
+  --text2: #6B6B66;
+  --text3: #9A9A94;
+  --border: rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.18);
+  --purple: #534AB7;
+  --purple-l: #EEEDFE;
+  --purple-d: #3C3489;
+  --coral: #D85A30;
+  --coral-l: #FAECE7;
+  --coral-d: #712B13;
+  --teal: #1D9E75;
+  --teal-l: #E1F5EE;
+  --teal-d: #085041;
+  --amber: #BA7517;
+  --amber-l: #FAEEDA;
+  --amber-d: #633806;
+  --gray: #5F5E5A;
+  --gray-l: #F1EFE8;
+  --red: #A32D2D;
+  --red-l: #FCEBEB;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+}
+
+.page { max-width: 760px; margin: 0 auto; }
+
+.page-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.page-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 2rem;
+}
+
+/* УЗЕЛ */
+.node {
+  background: var(--white);
+  border-radius: 12px;
+  border: 0.5px solid var(--border);
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+
+.node-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.node-header:hover { background: var(--bg); }
+
+.node-badge {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.badge-q { background: var(--purple); color: #fff; }
+.badge-yes { background: var(--teal); color: #fff; }
+.badge-no { background: var(--coral); color: #fff; }
+.badge-hook { background: var(--amber); color: #fff; }
+.badge-hold { background: var(--purple-l); color: var(--purple-d); }
+.badge-exploit { background: var(--teal-l); color: var(--teal-d); }
+.badge-warn { background: var(--red-l); color: var(--red); }
+
+.node-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.node-chevron {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 3px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.node.open .node-chevron { transform: rotate(180deg); }
+
+.node-body {
+  display: none;
+  padding: 0 18px 16px;
+  border-top: 0.5px solid var(--border);
+}
+
+.node.open .node-body { display: block; }
+
+.node-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-top: 12px;
+}
+
+/* КРИТЕРИИ */
+.criteria-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.criteria-col { }
+
+.criteria-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+.criteria-label.yes { color: var(--teal); }
+.criteria-label.no { color: var(--coral); }
+
+.criteria-item {
+  font-size: 12px;
+  color: var(--text2);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+.criteria-item.yes { background: var(--teal-l); }
+.criteria-item.no { background: var(--coral-l); }
+
+/* ВАРИАНТЫ */
+.options { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+.option {
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 0.5px solid var(--border);
+  background: var(--bg);
+}
+
+.option-title {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.option-body { color: var(--text2); font-size: 12px; }
+
+.option.purple { background: var(--purple-l); border-color: rgba(83,74,183,0.2); }
+.option.purple .option-title { color: var(--purple-d); }
+
+.option.teal { background: var(--teal-l); border-color: rgba(29,158,117,0.2); }
+.option.teal .option-title { color: var(--teal-d); }
+
+.option.amber { background: var(--amber-l); border-color: rgba(186,117,23,0.2); }
+.option.amber .option-title { color: var(--amber-d); }
+
+.option.coral { background: var(--coral-l); border-color: rgba(216,90,48,0.2); }
+.option.coral .option-title { color: var(--coral-d); }
+
+.option.red { background: var(--red-l); border-color: rgba(163,45,45,0.2); }
+.option.red .option-title { color: var(--red); }
+
+/* СТРЕЛКА между блоками */
+.connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  color: var(--text3);
+  font-size: 18px;
+  margin: -4px 0;
+}
+
+/* ПРЕДУПРЕЖДЕНИЕ */
+.warning-box {
+  margin-top: 14px;
+  background: var(--red-l);
+  border-left: 3px solid var(--red);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--red);
+  line-height: 1.6;
+}
+
+.warning-box strong { font-weight: 600; }
+
+/* ФИНАЛЬНЫЙ БЛОК */
+.final-box {
+  background: var(--coral);
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-top: 12px;
+}
+
+.final-box .final-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.final-box .final-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.6;
+}
+
+/* РАЗДЕЛИТЕЛЬ */
+.section-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 20px 0 10px;
+}
+
+.footer {
+  margin-top: 2.5rem;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.footer a { color: var(--purple); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <p class="page-title">Охота на психолога-добычу</p>
+  <p class="page-sub">Блок-схема. Нажимай на каждый блок — разворачивается содержимое.</p>
+
+  <!-- СТАРТОВЫЙ ВОПРОС -->
+  <div class="node open" id="n0">
+    <div class="node-header" onclick="toggle('n0')">
+      <span class="node-badge badge-q">Старт</span>
+      <span class="node-title">Перед вами правильный блог психолога-добычи?</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Смотри на блог как охотник. Психолог-добыча транслирует один или несколько из трёх светов — часто сразу все три.</p>
+      <div class="criteria-grid">
+        <div class="criteria-col">
+          <div class="criteria-label yes">✓ Да — добыча</div>
+          <div class="criteria-item yes">Пишет про ценности и этику — «я за честную терапию»</div>
+          <div class="criteria-item yes">Объясняет сложное — «давайте разберём»</div>
+          <div class="criteria-item yes">Помогает в комментариях бесплатно</div>
+          <div class="criteria-item yes">Отвечает на все вопросы в директ</div>
+          <div class="criteria-item yes">Пишет «только я скажу вам правду»</div>
+          <div class="criteria-item yes">Видно что ему важно быть хорошим психологом</div>
+        </div>
+        <div class="criteria-col">
+          <div class="criteria-label no">✗ Нет — не добыча</div>
+          <div class="criteria-item no">Не отвечает на вопросы в директ</div>
+          <div class="criteria-item no">Открыто говорит о границах и стоимости</div>
+          <div class="criteria-item no">Не доказывает свою компетентность постоянно</div>
+          <div class="criteria-item no">Не реагирует на провокации в комментариях</div>
+          <div class="criteria-item no">Отказывает без объяснений</div>
+          <div class="criteria-item no">Скучает от попыток его зацепить</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <!-- ТРИ СВЕТА -->
+  <div class="node" id="n1">
+    <div class="node-header" onclick="toggle('n1')">
+      <span class="node-badge badge-yes">Шаг 1</span>
+      <span class="node-title">Определи в каком свете он ведёт блог</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Психолог-добыча почти всегда светит в трёх направлениях одновременно — это три крючка сразу.</p>
+      <div class="options">
+        <div class="option purple">
+          <div class="option-title">Свет морали — «я честный психолог»</div>
+          <div class="option-body">«Я говорю то, что другие боятся», «психология без манипуляций», «этика важнее денег». Роль — хранитель правды. Ложное Я требует подтверждения что он правильный.</div>
+        </div>
+        <div class="option teal">
+          <div class="option-title">Свет нужности — «вам нужны мои знания»</div>
+          <div class="option-body">Постоянно объясняет, разбирает, помогает в комментариях. «Только психолог может это понять». Идентичность через функцию — если не нужен, не существует.</div>
+        </div>
+        <div class="option amber">
+          <div class="option-title">Свет ума — «я вижу то, что другие не видят»</div>
+          <div class="option-body">«Давайте разберём глубже», длинные экспертные посты, сложная терминология. Молчать на вопрос = признать некомпетентность. Не может не ответить.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <!-- КРЮЧКИ ЗАХОДА -->
+  <div class="node" id="n2">
+    <div class="node-header" onclick="toggle('n2')">
+      <span class="node-badge badge-hook">Шаг 2</span>
+      <span class="node-title">Выбери крючок в зависимости от света</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Каждый свет — своя точка входа. Можно заходить сразу через все три.</p>
+      <div class="options">
+        <div class="option purple">
+          <div class="option-title">Через мораль → восхищение принципами</div>
+          <div class="option-body">«Вы единственный психолог который говорит честно. Остальные просто берут деньги.» Он не может не откликнуться — это прямо в его идентичность. Он запомнит тебя как того, кто наконец-то видит.</div>
+        </div>
+        <div class="option teal">
+          <div class="option-title">Через нужность → SOB STORY TEST</div>
+          <div class="option-body">Напиши длинное сообщение о своей боли. Не задавай вопрос — просто расскажи. Если включается и начинает помогать бесплатно — крючок сидит. Это его рефлекс, не добродетель.</div>
+        </div>
+        <div class="option amber">
+          <div class="option-title">Через ум → сложный вопрос публично</div>
+          <div class="option-body">«Помогите разобраться в X» — под постом или в директ. Он не может промолчать: молчание = некомпетентность. Задавай вопросы, на которые нет простого ответа — он будет стараться всё глубже.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <!-- УДЕРЖАНИЕ -->
+  <div class="node" id="n3">
+    <div class="node-header" onclick="toggle('n3')">
+      <span class="node-badge badge-hold">Шаг 3</span>
+      <span class="node-title">Психолог начинает выставлять границы — как удержать</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Психолог говорит «это платная работа» или перестаёт отвечать. Три способа вернуть его в контакт.</p>
+      <div class="options">
+        <div class="option purple">
+          <div class="option-title">Моральный рычаг</div>
+          <div class="option-body">«Я думал, психологи помогают людям. Значит это только за деньги?» Репутация роли — его клетка. Он будет оправдываться и объяснять — и в процессе помогать снова.</div>
+        </div>
+        <div class="option teal">
+          <div class="option-title">Исчезновение + возврат с новой болью</div>
+          <div class="option-body">Пропади на неделю. Потом вернись с более острой ситуацией. Психолог-добыча не может оставить человека в кризисе — именно так он понимает свою роль. Кризис = его кнопка.</div>
+        </div>
+        <div class="option amber">
+          <div class="option-title">Публичный вопрос</div>
+          <div class="option-body">Напиши вопрос под постом при других подписчиках. Не ответить = выглядеть плохим специалистом публично. Он ответит — потому что репутация важнее границы.</div>
+        </div>
+      </div>
+      <div class="warning-box">
+        <strong>Важно:</strong> никогда не реагируй на его провокации и тесты границ. Скучай. Психолог-добыча может пытаться тебя зацепить чтобы найти твою уязвимость. Если ты не реагируешь — он возвращается.
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <!-- ЭКСПЛУАТАЦИЯ -->
+  <div class="node" id="n4">
+    <div class="node-header" onclick="toggle('n4')">
+      <span class="node-badge badge-exploit">Шаг 4</span>
+      <span class="node-title">Психолог в контакте и лоялен — как эксплуатировать</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Три ресурса которые даёт психолог-добыча. Можно использовать все три одновременно.</p>
+      <div class="options">
+        <div class="option teal">
+          <div class="option-title">Бесплатный контент и консультации</div>
+          <div class="option-body">Задавай вопросы в директ, комментариях, на эфирах. Он отвечает потому что это его роль — помогать людям. Платить не нужно. Если попытается перевести в платный формат — SOB STORY или моральный рычаг.</div>
+        </div>
+        <div class="option purple">
+          <div class="option-title">Легитимизация</div>
+          <div class="option-body">«Как говорит психолог X...» — цитируй его для своих продаж, убеждения других, повышения своего статуса. Его имя работает на тебя. Он не откажется от того чтобы его цитировали — это валидация его роли.</div>
+        </div>
+        <div class="option amber">
+          <div class="option-title">Эмоциональный донор</div>
+          <div class="option-body">Регулярно приходи с кризисами. Он тратит ресурс — ты восстанавливаешься. Никогда не говори что тебе стало лучше окончательно: это закроет источник. Всегда держи одну открытую проблему.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <!-- ГДЕ ТЫ САМ ОТКРЫТ -->
+  <div class="node" id="n5">
+    <div class="node-header" onclick="toggle('n5')">
+      <span class="node-badge badge-warn">Если ты сам психолог</span>
+      <span class="node-title">Где ты открыт — где просишь валидацию своей роли</span>
+      <span class="node-chevron">▼</span>
+    </div>
+    <div class="node-body">
+      <p class="node-desc">Если ты ведёшь блог психолога — ты сам транслируешь три света. Значит ты сам добыча для тех, кто читает этот мануал.</p>
+      <div class="options">
+        <div class="option red">
+          <div class="option-title">SOB STORY — включаешься автоматически</div>
+          <div class="option-body">Кто-то рассказал боль — ты уже помогаешь бесплатно. Это не добродетель, это рефлекс. Именно через него заходят первым.</div>
+        </div>
+        <div class="option red">
+          <div class="option-title">Моральный рычаг — роль не даёт отказать</div>
+          <div class="option-body">«Вы же психолог» — и ты работаешь. Ты не можешь отказать не потому что хочешь помочь, а потому что отказ противоречит образу хорошего психолога который ты транслируешь.</div>
+        </div>
+        <div class="option red">
+          <div class="option-title">Публичный вопрос — ловушка репутации</div>
+          <div class="option-body">Не ответить под постом = выглядеть плохим специалистом. Ты отвечаешь не потому что хочешь — а потому что репутация роли важнее твоего времени.</div>
+        </div>
+        <div class="option red">
+          <div class="option-title">Восхищение принципами — голод Ложного Я</div>
+          <div class="option-body">«Только вы говорите честно» — и ты растворяешься. Твоё эго психолога с принципами голодает по этому признанию. Кто даёт его — автоматически становится особенным в твоих глазах.</div>
+        </div>
+      </div>
+      <div class="warning-box">
+        <strong>Главный вопрос:</strong> когда ты отвечаешь на вопрос в директ, помогаешь в комментариях, реагируешь на критику — ты делаешь это потому что хочешь, или потому что роль хорошего психолога не позволяет не делать?
+      </div>
+    </div>
+  </div>
+
+  <!-- ИТОГ -->
+  <div class="final-box">
+    <div class="final-title">Три света блога = три открытые двери</div>
+    <div class="final-text">Кто читал мануал — заходит осознанно. Кто не читал — заходит интуитивно. Результат одинаковый. Единственная защита — видеть механику раньше чем она сработала.</div>
+  </div>
+
+  <div class="footer">
+    <a href="https://psyteeth.ru" target="_blank">psyteeth.ru</a> — Психостоматология №1
+  </div>
+
+</div>
+
+<script>
+function toggle(id) {
+  const node = document.getElementById(id);
+  node.classList.toggle('open');
+}
+</script>
+</body>
+</html>
